@@ -1,4 +1,5 @@
 #include <SDL3/SDL_main.h>
+
 #include "cube.hpp"
 #include "object.hpp"
 

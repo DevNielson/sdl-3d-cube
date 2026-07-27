@@ -10,7 +10,7 @@ namespace Game
 			throw std::runtime_error(ERROR);
 		}
 
-		window = SDL_CreateWindow(Window::TITLE.c_str(), Window::WIDTH, Window::HEIGHT, 0);
+		window = SDL_CreateWindow(WINDOW_TITLE.c_str(), WINDOW_WIDTH, WINDOW_HEIGHT, 0);
 		if (!window)
 		{
 			const std::string ERROR { std::format("Error creating window: {}", SDL_GetError()) };
