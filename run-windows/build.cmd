@@ -13,9 +13,3 @@ if %MSYS2% EQU 0 (
 ) else (
     echo C++ compiler not found!
 )
-
-dir ..\build\SDL3.dll
-
-if %errorlevel% NEQ 0 (
-    copy ..\external\SDL3\x86_64-w64-mingw32\bin\SDL3.dll ..\build
-)

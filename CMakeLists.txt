@@ -8,13 +8,36 @@ file(GLOB_RECURSE SOURCES "./src/*.cpp")
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 
-target_include_directories(${PROJECT_NAME}
-    PRIVATE
-        "./include"
-        "./external/SDL3/x86_64-w64-mingw32/include"
-)
+set(SDL_X86_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external/SDL3/x86_64-w64-mingw32")
+set(SDL_I686_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external/SDL3/i686-w64-mingw32")
 
-target_link_directories(${PROJECT_NAME} PRIVATE "./external/SDL3/x86_64-w64-mingw32/lib")
+if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+    target_include_directories(${PROJECT_NAME}
+        PRIVATE
+            "${CMAKE_CURRENT_SOURCE_DIR}/include"
+            "${SDL_X86_DIR}/include"
+    )
+
+    target_link_directories(${PROJECT_NAME}
+        PRIVATE
+            "${SDL_X86_DIR}/lib"
+    )
+    
+    file(COPY "${SDL_X86_DIR}/bin/SDL3.dll" DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}/build")
+else()
+    target_include_directories(${PROJECT_NAME}
+        PRIVATE
+            "${CMAKE_CURRENT_SOURCE_DIR}/include"
+            "${SDL_I686_DIR}/include"
+    )
+
+    target_link_directories(${PROJECT_NAME}
+        PRIVATE
+            "${SDL_I686_DIR}/lib"
+    )
+
+    file(COPY "${SDL_I686_DIR}/bin/SDL3.dll" DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}/build")
+endif()
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE

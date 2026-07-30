@@ -109,8 +109,7 @@ void Object::update() {
 	}
 }
 
-void Object::matrix_of_projection()
-{
+void Object::matrix_of_projection() {
 	float aspectRatio{ WINDOW_WIDTH / WINDOW_HEIGHT };
 	float near{ 0.1f };
 	float far{ 1000.0f };
