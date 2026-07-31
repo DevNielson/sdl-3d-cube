@@ -13,7 +13,7 @@ int main(int argc, char **argv) {
 		SDL_Renderer *renderer{ SDL_CreateRenderer(window, nullptr) };
 		if (!renderer) { throw std::string(std::format("Error creating renderer: {}", SDL_GetError())); }
 
-		Object cube(object);
+		Object cube{ object };
 
 		bool is_running{ true };
 		while (is_running) {
@@ -39,6 +39,8 @@ int main(int argc, char **argv) {
 				SDL_RenderPresent(renderer);
 			}
 		}
+		SDL_DestroyRenderer(renderer);
+		SDL_DestroyWindow(window);
 		SDL_Quit();
 	}
 	catch (const std::string e) {

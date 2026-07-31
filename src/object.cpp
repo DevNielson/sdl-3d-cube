@@ -2,7 +2,7 @@
 
 Object::Object(Object3d obj3d)
 	: m_object{ obj3d },
-	  m_object_projected{ std::vector<Polygon2d>(m_object.polygons.size()) }
+	  m_object_projected{ std::vector<Polygon2d>{ m_object.polygons.size() } }
 {
 	matrix_of_projection();
 	project_object();
