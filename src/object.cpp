@@ -1,8 +1,8 @@
 #include "object.hpp"
 
-Object::Object(Object3d obj3d, Object2d obj2d)
+Object::Object(Object3d obj3d)
 	: m_object{ obj3d },
-	  m_object_projected{ obj2d }
+	  m_object_projected{ std::vector<Polygon2d>(m_object.polygons.size()) }
 {
 	matrix_of_projection();
 	project_object();
@@ -11,10 +11,11 @@ Object::Object(Object3d obj3d, Object2d obj2d)
 	real_coordinates_log();
 }
 
-void Object::coordinates_log() {
+void Object::coordinates_log() const {
 	std::println("{:*^20}", '*');
 	std::println("Coordinates x, y, z");
 	std::println("{:*^20}", '*');
+
 	for (Polygon3d polygon : m_object.polygons) {
 		std::println("vertex0 x = {}", polygon.vertex.at(0).x);
 		std::println("vertex0 y = {}", polygon.vertex.at(0).y);
@@ -28,12 +29,12 @@ void Object::coordinates_log() {
 
 		std::println("vertex2 x = {}", polygon.vertex.at(2).x);
 		std::println("vertex2 y = {}", polygon.vertex.at(2).y);
-		std::println("vertex2 z = {}\n", polygon.vertex.at(2).z);
+		std::println("vertex2 z = {}", polygon.vertex.at(2).z);
 	}
 	std::println("{:*^20}\n", '*');
 }
 
-void Object::real_coordinates_log() {
+void Object::real_coordinates_log() const {
 	std::println("{:*^20}", '*');
 	std::println("Real Coordinates x, y");
 	std::println("{:*^20}", '*');
@@ -46,7 +47,7 @@ void Object::real_coordinates_log() {
 		std::println("vertex1 y = {}\n", polygon.vertex.at(1).y);
 
 		std::println("vertex2 x = {}", polygon.vertex.at(2).x);
-		std::println("vertex2 y = {}\n", polygon.vertex.at(2).y);
+		std::println("vertex2 y = {}", polygon.vertex.at(2).y);
 	}
 	std::println("{:*^20}\n", '*');
 }
@@ -110,17 +111,17 @@ void Object::update() {
 }
 
 void Object::matrix_of_projection() {
-	float aspectRatio{ WINDOW_WIDTH / WINDOW_HEIGHT };
-	float near{ 0.1f };
-	float far{ 1000.0f };
-	float fov{ std::numbers::pi / 2 };
-	float q{ far / (far - near) };
+	const float ASPECT_RATIO{ WINDOW_WIDTH / WINDOW_HEIGHT };
+	const float NEAR{ 0.1f };
+	const float FAR{ 1000.0f };
+	const float FOV{ std::numbers::pi / 2 };
+	const float Q{ FAR / (FAR - NEAR) };
 
 	for (std::size_t i {}; i < m_object.polygons.size(); ++i) {
 		for (std::size_t c {}; c < 3; ++c) {
-			float z{ m_object.polygons.at(i).vertex.at(c).z * q - near * q };
-			m_object_projected.polygons.at(i).vertex.at(c).x = aspectRatio * 1 / (fov / 2) * m_object.polygons.at(i).vertex.at(c).x / z;
-			m_object_projected.polygons.at(i).vertex.at(c).y = 1 / (fov / 2) * m_object.polygons.at(i).vertex.at(c).y / z;
+			float z{ m_object.polygons.at(i).vertex.at(c).z * Q - NEAR * Q };
+			m_object_projected.polygons.at(i).vertex.at(c).x = ASPECT_RATIO * 1 / (FOV / 2) * m_object.polygons.at(i).vertex.at(c).x / z;
+			m_object_projected.polygons.at(i).vertex.at(c).y = 1 / (FOV / 2) * m_object.polygons.at(i).vertex.at(c).y / z;
 		}
 	}
 }
@@ -144,7 +145,7 @@ void Object::render_object(SDL_Renderer *renderer) const {
 	}
 }
 
-void Object::render_polygon(SDL_Renderer *renderer, Polygon2d polygon2d, Polygon3d polygon3d) const {
+void Object::render_polygon(SDL_Renderer *renderer, const Polygon2d polygon2d, const Polygon3d polygon3d) const {
 	if ((polygon3d.vertex.at(0).z < 0) &&
 		(polygon3d.vertex.at(1).z < 0) &&
 		(polygon3d.vertex.at(2).z < 0)) { return; }

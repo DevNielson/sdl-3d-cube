@@ -7,14 +7,13 @@ int main(int argc, char **argv) {
 	try {
 		if (!SDL_Init(SDL_INIT_VIDEO)) { throw std::string(std::format("Error initialize SDL3: {}", SDL_GetError())); }
 
-		SDL_Window *window { SDL_CreateWindow(WINDOW_TITLE.c_str(), WINDOW_WIDTH, WINDOW_HEIGHT, 0) };
+		SDL_Window *window{ SDL_CreateWindow(WINDOW_TITLE.c_str(), WINDOW_WIDTH, WINDOW_HEIGHT, 0) };
 		if (!window) { throw std::string(std::format("Error creating window: {}", SDL_GetError())); }
 
-		SDL_Renderer *renderer { SDL_CreateRenderer(window, nullptr) };
+		SDL_Renderer *renderer{ SDL_CreateRenderer(window, nullptr) };
 		if (!renderer) { throw std::string(std::format("Error creating renderer: {}", SDL_GetError())); }
 
-		Object2d object_projected{ { {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {} } };
-		Object cube(object, object_projected);
+		Object cube(object);
 
 		bool is_running{ true };
 		while (is_running) {
@@ -40,8 +39,9 @@ int main(int argc, char **argv) {
 				SDL_RenderPresent(renderer);
 			}
 		}
+		SDL_Quit();
 	}
-	catch (std::string e) {
+	catch (const std::string e) {
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", e.c_str(), nullptr);
 		return EXIT_FAILURE;
 	}
