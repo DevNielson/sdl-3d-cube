@@ -1,12 +1,13 @@
 #pragma once
 #include "main.hpp"
 
-class Object {
+class Object
+{
 public:
 	Object3d m_object;
 	Object2d m_object_projected;
 
-	Object(Object3d);
+	Object(const Object3d);
 
 	void coordinates_log() const;
 	void real_coordinates_log() const;
