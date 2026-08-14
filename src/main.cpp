@@ -15,7 +15,7 @@ int main(int argc, char **argv)
 		SDL_Renderer *renderer{ SDL_CreateRenderer(window, nullptr) };
 		if (!renderer) { throw std::string(std::format("Error creating renderer: {}", SDL_GetError())); }
 
-		Object cube{ object };
+		Object cube{ utils::Vec3d{ .x{ -0.5f }, .y{ -0.5f }, .z{ 1.5f } }, object };
 
 		bool is_running{ true };
 		while (is_running)
@@ -30,7 +30,7 @@ int main(int argc, char **argv)
 						break;
 					case SDL_EVENT_KEY_DOWN:
 						cube.update();
-						cube.coordinates_log();
+						cube.real_coordinates_log();
 						break;
 					default:
 						break;

@@ -1,48 +1,34 @@
 #include "object.hpp"
 
-Object::Object(const Object3d obj3d)
-	: m_object{ obj3d },
-	  m_object_projected{ std::vector<Polygon2d>{ m_object.polygons.size() } }
+Object::Object(const utils::Vec3d position, const utils::Object3d obj)
+	: m_position{ position },
+	  m_object{ obj },
+	  m_object_projected{ std::vector<utils::Polygon2d>{ m_object.polygons.size() } }
 {
 	matrix_of_projection();
 	project_object();
-
-	coordinates_log();
-	real_coordinates_log();
-}
-
-void Object::coordinates_log() const
-{
-	std::println("{:*^20}", '*');
-	std::println("Coordinates x, y, z");
-	std::println("{:*^20}", '*');
-
-	for (Polygon3d polygon : m_object.polygons)
-	{
-		std::println("vertex0 x = {}", polygon.vertex.at(0).x);
-		std::println("vertex0 y = {}", polygon.vertex.at(0).y);
-		std::println("vertex0 z = {}", polygon.vertex.at(0).z);
-		std::println();
-
-		std::println("vertex1 x = {}", polygon.vertex.at(1).x);
-		std::println("vertex1 y = {}", polygon.vertex.at(1).y);
-		std::println("vertex1 z = {}", polygon.vertex.at(1).z);
-		std::println();
-
-		std::println("vertex2 x = {}", polygon.vertex.at(2).x);
-		std::println("vertex2 y = {}", polygon.vertex.at(2).y);
-		std::println("vertex2 z = {}", polygon.vertex.at(2).z);
-	}
-	std::println("{:*^20}\n", '*');
 }
 
 void Object::real_coordinates_log() const
 {
 	std::println("{:*^20}", '*');
+	std::println("Coordinates x, y, z");
+	std::println("{:*^20}", '*');
+
+	std::println("position x: {}", m_position.x);
+	std::println("position y: {}", m_position.y);
+	std::println("position z :{}\n", m_position.z);
+
+	std::println("{:*^20}\n", '*');
+}
+
+void Object::coordinates_log() const
+{
+	std::println("{:*^20}", '*');
 	std::println("Real Coordinates x, y");
 	std::println("{:*^20}", '*');
 
-	for (Polygon2d polygon : m_object_projected.polygons)
+	for (utils::Polygon2d polygon : m_object_projected.polygons)
 	{
 		std::println("vertex0 x = {}", polygon.vertex.at(0).x);
 		std::println("vertex0 y = {}\n", polygon.vertex.at(0).y);
@@ -58,76 +44,48 @@ void Object::real_coordinates_log() const
 
 void Object::update()
 {
-	const bool *key_state{ SDL_GetKeyboardState(nullptr) };
-	if (key_state[SDL_SCANCODE_W])
+	const bool *KEY_STATE{ SDL_GetKeyboardState(nullptr) };
+	constexpr float SPEED{ 0.5f };
+
+	if (KEY_STATE[SDL_SCANCODE_W])
 	{
-		for (Polygon3d &polygon : m_object.polygons)
-		{
-			for (Vec3d &vertex : polygon.vertex)
-			{
-				vertex.z += 0.3f;
-			}
-		}
+		m_position.z += SPEED;
+
 		matrix_of_projection();
 		project_object();
 	}
-	if (key_state[SDL_SCANCODE_A])
+	if (KEY_STATE[SDL_SCANCODE_A])
 	{
-		for (Polygon3d &polygon : m_object.polygons)
-		{
-			for (Vec3d &vertex : polygon.vertex)
-			{
-				vertex.x -= 0.3f;
-			}
-		}
+		m_position.x -= SPEED;
+
 		matrix_of_projection();
 		project_object();
 	}
-	if (key_state[SDL_SCANCODE_S])
+	if (KEY_STATE[SDL_SCANCODE_S])
 	{
-		for (Polygon3d &polygon : m_object.polygons)
-		{
-			for (Vec3d &vertex : polygon.vertex)
-			{
-				vertex.z -= 0.3f;
-			}
-		}
+		m_position.z -= SPEED;
+
 		matrix_of_projection();
 		project_object();
 	}
-	if (key_state[SDL_SCANCODE_D])
+	if (KEY_STATE[SDL_SCANCODE_D])
 	{
-		for (Polygon3d &polygon : m_object.polygons)
-		{
-			for (Vec3d &vertex : polygon.vertex)
-			{
-				vertex.x += 0.3f;
-			}
-		}
+		m_position.x += SPEED;
+
 		matrix_of_projection();
 		project_object();
 	}
-	if (key_state[SDL_SCANCODE_SPACE])
+	if (KEY_STATE[SDL_SCANCODE_SPACE])
 	{
-		for (Polygon3d &polygon : m_object.polygons)
-		{
-			for (Vec3d &vertex : polygon.vertex)
-			{
-				vertex.y += 0.3f;
-			}
-		}
+		m_position.y += SPEED;
+
 		matrix_of_projection();
 		project_object();
 	}
-	if (key_state[SDL_SCANCODE_LSHIFT])
+	if (KEY_STATE[SDL_SCANCODE_LSHIFT])
 	{
-		for (Polygon3d &polygon : m_object.polygons)
-		{
-			for (Vec3d &vertex : polygon.vertex)
-			{
-				vertex.y -= 0.3f;
-			}
-		}
+		m_position.y -= SPEED;
+
 		matrix_of_projection();
 		project_object();
 	}
@@ -135,34 +93,35 @@ void Object::update()
 
 void Object::matrix_of_projection()
 {
-	const float ASPECT_RATIO{ WINDOW_WIDTH / WINDOW_HEIGHT };
-	const float NEAR{ 0.1f };
-	const float FAR{ 1000.0f };
-	const float FOV{ std::numbers::pi / 2 };
-	const float Q{ FAR / (FAR - NEAR) };
+	constexpr float ASPECT_RATIO{ WINDOW_WIDTH / WINDOW_HEIGHT };
+	constexpr float NEAR{ 0.1f };
+	constexpr float FAR{ 1000.0f };
+	constexpr float FOV{ std::numbers::pi / 2 };
+	constexpr float Q{ FAR / (FAR - NEAR) };
 
 	for (std::size_t i {}; i < m_object.polygons.size(); ++i)
 	{
-		for (std::size_t c {}; c < 3; ++c)
+		constexpr std::size_t NUMBER_OF_VERTEX{ 3 };
+		for (std::size_t c {}; c < NUMBER_OF_VERTEX; ++c)
 		{
-			float z{ m_object.polygons.at(i).vertex.at(c).z * Q - NEAR * Q };
-			m_object_projected.polygons.at(i).vertex.at(c).x = ASPECT_RATIO * 1 / (FOV / 2) * m_object.polygons.at(i).vertex.at(c).x / z;
-			m_object_projected.polygons.at(i).vertex.at(c).y = 1 / (FOV / 2) * m_object.polygons.at(i).vertex.at(c).y / z;
+			float z{ (m_object.polygons.at(i).vertex.at(c).z + m_position.z) * Q - NEAR * Q };
+			m_object_projected.polygons.at(i).vertex.at(c).x = ASPECT_RATIO * 1 / (FOV / 2) * (m_object.polygons.at(i).vertex.at(c).x + m_position.x) / z;
+			m_object_projected.polygons.at(i).vertex.at(c).y = 1 / (FOV / 2) * (m_object.polygons.at(i).vertex.at(c).y + m_position.y) / z;
 		}
 	}
 }
 
 void Object::project_object()
 {
-	for (Polygon2d &polygon : m_object_projected. polygons)
+	for (utils::Polygon2d &polygon : m_object_projected.polygons)
 	{
 		project_polygon(polygon);
 	}
 }
 
-void Object::project_polygon(Polygon2d &polygon)
+void Object::project_polygon(utils::Polygon2d &polygon)
 {
-	for (Vec2d &vertex : polygon.vertex)
+	for (utils::Vec2d &vertex : polygon.vertex)
 	{
 		vertex.x = (1 + vertex.x) * WINDOW_WIDTH / 2;
 		vertex.y = (1 + (-1) * vertex.y) * WINDOW_HEIGHT / 2;
@@ -177,11 +136,9 @@ void Object::render_object(SDL_Renderer *renderer) const
 	}
 }
 
-void Object::render_polygon(SDL_Renderer *renderer, const Polygon2d polygon2d, const Polygon3d polygon3d) const
+void Object::render_polygon(SDL_Renderer *renderer, const utils::Polygon2d polygon2d, const utils::Polygon3d polygon3d) const
 {
-	if ((polygon3d.vertex.at(0).z < 0) &&
-		(polygon3d.vertex.at(1).z < 0) &&
-		(polygon3d.vertex.at(2).z < 0)) { return; }
+	if (m_position.z <= 0.0f) { return; }
 
 	if (((polygon2d.vertex.at(0).x < 0) || (polygon2d.vertex.at(0).x > WINDOW_WIDTH) || 
 		 (polygon2d.vertex.at(0).y < 0) || (polygon2d.vertex.at(0).y > WINDOW_HEIGHT)) &&

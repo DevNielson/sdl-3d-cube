@@ -1,20 +1,29 @@
 #pragma once
-#include "main.hpp"
+#include "utils.hpp"
 
 class Object
 {
+private:
+	utils::Vec3d m_position;
+	utils::Object3d m_object;
+	utils::Object2d m_object_projected;
+
 public:
-	Object3d m_object;
-	Object2d m_object_projected;
+	Object(const utils::Vec3d, const utils::Object3d);
 
-	Object(const Object3d);
-
-	void coordinates_log() const;
+public:
 	void real_coordinates_log() const;
+	void coordinates_log() const;
+
+public:
 	void matrix_of_projection();
 	void project_object();
-	void project_polygon(Polygon2d &);
+	void project_polygon(utils::Polygon2d &);
+
+public:
 	void render_object(SDL_Renderer *) const;
-	void render_polygon(SDL_Renderer *, const Polygon2d, const Polygon3d) const;
+	void render_polygon(SDL_Renderer *, const utils::Polygon2d, const utils::Polygon3d) const;
+
+public:
 	void update();
 };
