@@ -11,6 +11,7 @@ add_executable(${PROJECT_NAME} ${SOURCES})
 target_include_directories(${PROJECT_NAME}
     PRIVATE
         "${CMAKE_CURRENT_SOURCE_DIR}/include"
+        "${CMAKE_CURRENT_SOURCE_DIR}/external/glm"
 )
 
 set(SDL_X86_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external/SDL3/x86_64-w64-mingw32")

@@ -1,11 +1,11 @@
 #include "object.hpp"
 
-Object::Object(const utils::Vec3d position, const utils::Object3d obj)
+Object::Object(const glm::vec3 position, const utils::Object3d obj)
 	: m_position{ position },
 	  m_object{ obj },
 	  m_object_projected{ std::vector<utils::Polygon2d>{ m_object.polygons.size() } }
 {
-	matrix_of_projection();
+	translation();
 	project_object();
 }
 
@@ -51,53 +51,56 @@ void Object::update()
 	{
 		m_position.z += SPEED;
 
-		matrix_of_projection();
+		translation();
 		project_object();
 	}
 	if (KEY_STATE[SDL_SCANCODE_A])
 	{
 		m_position.x -= SPEED;
 
-		matrix_of_projection();
+		translation();
 		project_object();
 	}
 	if (KEY_STATE[SDL_SCANCODE_S])
 	{
 		m_position.z -= SPEED;
 
-		matrix_of_projection();
+		translation();
 		project_object();
 	}
 	if (KEY_STATE[SDL_SCANCODE_D])
 	{
 		m_position.x += SPEED;
 
-		matrix_of_projection();
+		translation();
 		project_object();
 	}
 	if (KEY_STATE[SDL_SCANCODE_SPACE])
 	{
 		m_position.y += SPEED;
 
-		matrix_of_projection();
+		translation();
 		project_object();
 	}
 	if (KEY_STATE[SDL_SCANCODE_LSHIFT])
 	{
 		m_position.y -= SPEED;
 
-		matrix_of_projection();
+		translation();
 		project_object();
 	}
 }
 
-void Object::matrix_of_projection()
+void Object::translation()
 {
 	constexpr float ASPECT_RATIO{ WINDOW_WIDTH / WINDOW_HEIGHT };
 	constexpr float NEAR{ 0.1f };
 	constexpr float FAR{ 1000.0f };
 	constexpr float FOV{ std::numbers::pi / 2 };
+	// constexpr float FOV{ 45.0f };
 	constexpr float Q{ FAR / (FAR - NEAR) };
+
+    // glm::mat4 proj{ glm::perspective(glm::radians(FOV), ASPECT_RATIO, NEAR, FAR) };
 
 	for (std::size_t i {}; i < m_object.polygons.size(); ++i)
 	{
@@ -121,7 +124,7 @@ void Object::project_object()
 
 void Object::project_polygon(utils::Polygon2d &polygon)
 {
-	for (utils::Vec2d &vertex : polygon.vertex)
+	for (glm::vec3 &vertex : polygon.vertex)
 	{
 		vertex.x = (1 + vertex.x) * WINDOW_WIDTH / 2;
 		vertex.y = (1 + (-1) * vertex.y) * WINDOW_HEIGHT / 2;

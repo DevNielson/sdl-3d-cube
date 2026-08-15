@@ -1,6 +1,9 @@
 #pragma once
 #include <SDL3/SDL.h>
 
+#include <glm/glm.hpp>
+#include <glm/ext.hpp>
+
 #include <array>
 #include <format>
 #include <numbers>

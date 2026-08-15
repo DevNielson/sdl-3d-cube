@@ -15,7 +15,7 @@ int main(int argc, char **argv)
 		SDL_Renderer *renderer{ SDL_CreateRenderer(window, nullptr) };
 		if (!renderer) { throw std::string(std::format("Error creating renderer: {}", SDL_GetError())); }
 
-		Object cube{ utils::Vec3d{ .x{ -0.5f }, .y{ -0.5f }, .z{ 1.5f } }, object };
+		Object cube{ glm::vec3{ -0.5f, -0.5f, 1.5f }, object };
 
 		bool is_running{ true };
 		while (is_running)
